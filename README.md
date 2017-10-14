@@ -16,7 +16,7 @@ This is a straightforward boilerplate for building REST APIs with ES6 and Expres
 
 Getting Started
 ---------------
-
+test
 ```sh
 # clone it
 git clone git@github.com:developit/express-es6-rest-api.git
