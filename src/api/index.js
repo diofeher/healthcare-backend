@@ -63,9 +63,9 @@ export default ({ config, db }) => {
     api.get('/download/:fileid/', (req, res) => {
         var filePath = __dirname + '/test.js';
         fs.stat(filePath, function(err, result) {
-            console.log('unlink file first');
             if(err == null) {
-                fs.unlink(filePath);
+                console.log('unlink file first');
+                fs.unlinkSync(filePath);
             }
             var state = storj.resolveFile(bucketId, req.params.fileid, filePath, {
               progressCallback: function(progress, downloadedBytes, totalBytes) {},
@@ -78,8 +78,8 @@ export default ({ config, db }) => {
                         if (err) {
                             return console.log(err);
                         }
-                        res.json({data: data})
                         fs.unlink(filePath)
+                        res.json({data: data})
                     });
                 }
                 console.log('File download complete');
