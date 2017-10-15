@@ -79,7 +79,7 @@ exports.default = function (_ref) {
         console.log(req.params.fileid);
         var filePath = __dirname + '/test.js';
         if (fs.existsSync(filePath)) {
-            console.log('unlink');
+            console.log('unlink file first');
             fs.unlink(filePath);
         }
 
