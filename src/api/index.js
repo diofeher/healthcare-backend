@@ -70,6 +70,7 @@ export default ({ config, db }) => {
             var state = storj.resolveFile(bucketId, req.params.fileid, filePath, {
               progressCallback: function(progress, downloadedBytes, totalBytes) {},
               finishedCallback: function(err) {
+                console.log('finished callback');
                 if (err) {
                   return console.error(err);
                 }
