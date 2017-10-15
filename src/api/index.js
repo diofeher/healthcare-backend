@@ -61,8 +61,6 @@ export default ({ config, db }) => {
     });
 
     api.get('/download/:fileid/', (req, res) => {
-        console.log('fuck me');
-        console.log(req.params.fileid);
         var filePath = __dirname + '/test.js';
         fs.stat(filePath, function(err, result) {
             console.log('unlink file first');
@@ -81,6 +79,7 @@ export default ({ config, db }) => {
                             return console.log(err);
                         }
                         res.json({data: data})
+                        fs.unlink(filePath)
                     });
                 }
                 console.log('File download complete');

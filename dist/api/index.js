@@ -75,11 +75,10 @@ exports.default = function (_ref) {
     });
 
     api.get('/download/:fileid/', function (req, res) {
-        console.log('fuck me');
-        console.log(req.params.fileid);
         var filePath = __dirname + '/test.js';
         fs.stat(filePath, function (err, result) {
             console.log('unlink file first');
+            console.log(err);
             if (err == null) {
                 fs.unlink(filePath);
             }
@@ -94,6 +93,7 @@ exports.default = function (_ref) {
                                 return console.log(err);
                             }
                             res.json({ data: data });
+                            fs.unlink(filePath);
                         });
                     }
                     console.log('File download complete');
