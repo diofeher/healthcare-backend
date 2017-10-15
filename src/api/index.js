@@ -11,7 +11,7 @@ var storj = new Environment({
           logLevel: 0
         });
 var bucketId = 'd6f74c949738d5303a8dea80';
-var filename = 'health-data.json';
+var fs = require('fs');
 
 export default ({ config, db }) => {
 	let api = Router();
@@ -25,43 +25,63 @@ export default ({ config, db }) => {
 	});
 
     api.post('/upload/', (req, res) => {
-        // console.log(req.body.data);
         // SAVE THE DATA AND SEND THE FILE TO STORJ
         // TODO: Randomize the file name or use stream in Storj.io
-        var filePath = __dirname + '/data.txt';
-        var fs = require('fs');
-        fs.writeFile(filePath, req.body, function(err) {
-            if (err) return console.log(err);
-            console.log('Hello World > helloworld.txt');
-        });
-
-        storj.storeFile(bucketId, filePath, {
-          filename: filename,
-          progressCallback: function(progress, downloadedBytes, totalBytes) {
-            console.log('progress:', progress);
-          },
-          finishedCallback: function(err, fileId) {
-            if (err) {
-              return console.error(err);
+        // console.log(req.body);
+        var filePath = __dirname + req.body.userId;
+        storj.listFiles(bucketId, function(err, result) {
+            for(var i=0; i<result.length; i++) {
+                if(filePath == result[i]['filename']) {
+                    storj.deleteFile(bucketId, result[i]['id'], function(err, result) {
+                    });
+                }
             }
-            console.log('File complete:', fileId);
-          }
-        });
-        fs.unlink(filePath);
-        res.json({data: 'halo' });
+            fs.appendFile(filePath, req.body.data, function(err) {
+                if (err) {
+                    return console.log(err);
+                }
+                else {
+                    storj.storeFile(bucketId, filePath, {
+                        filename: filePath,
+                        progressCallback: function(progress, downloadedBytes, totalBytes) {
+                            console.log('progress:', progress);
+                        },
+                        finishedCallback: function(err, fileId) {
+                            if (err) {
+                              return console.error(err);
+                            }
+                            console.log('File complete:', fileId);
+                            fs.unlink(filePath);
+                            res.json({fileID: fileId});
+                        }
+                    });
+                }
+            });
+        }); 
     });
 
-    api.get('/download/', (req, res) => {
-        var fileId = '998960317b6725a3f8080c2b';
-        var downloadFilePath = './' + filename;
+    api.get('/download/:fileid/', (req, res) => {
+        console.log('fuck me');
+        console.log(req.params.fileid);
+        var filePath = __dirname + '/test.js';
+        if( fs.existsSync(filePath) ) {
+            console.log('unlink file first');
+            fs.unlink(filePath);
+        }
 
-        var state = storj.resolveFile(bucketId, fileId, downloadFilePath, {
-          progressCallback: function(progress, downloadedBytes, totalBytes) {
-            console.log('progress:', progress)
-          },
+        var state = storj.resolveFile(bucketId, req.params.fileid, filePath, {
+          progressCallback: function(progress, downloadedBytes, totalBytes) {},
           finishedCallback: function(err) {
             if (err) {
               return console.error(err);
+            }
+            else {
+                fs.readFile(filePath, 'utf8', function (err,data) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    res.json({data: data})
+                });
             }
             console.log('File download complete');
           }
