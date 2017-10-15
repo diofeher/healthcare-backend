@@ -20,6 +20,7 @@ test
 ```
 # Install dependencies
 npm install
+npm install github:storj/node-libstorj --save
 
 # Start development live-reload server
 PORT=8081 npm run dev
