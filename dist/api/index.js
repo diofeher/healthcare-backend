@@ -78,26 +78,27 @@ exports.default = function (_ref) {
         console.log('fuck me');
         console.log(req.params.fileid);
         var filePath = __dirname + '/test.js';
-        if (fs.existsSync(filePath)) {
+        fs.stat(filePath, function (err, result) {
             console.log('unlink file first');
-            fs.unlink(filePath);
-        }
-
-        var state = storj.resolveFile(bucketId, req.params.fileid, filePath, {
-            progressCallback: function progressCallback(progress, downloadedBytes, totalBytes) {},
-            finishedCallback: function finishedCallback(err) {
-                if (err) {
-                    return console.error(err);
-                } else {
-                    fs.readFile(filePath, 'utf8', function (err, data) {
-                        if (err) {
-                            return console.log(err);
-                        }
-                        res.json({ data: data });
-                    });
-                }
-                console.log('File download complete');
+            if (err == null) {
+                fs.unlink(filePath);
             }
+            var state = storj.resolveFile(bucketId, req.params.fileid, filePath, {
+                progressCallback: function progressCallback(progress, downloadedBytes, totalBytes) {},
+                finishedCallback: function finishedCallback(err) {
+                    if (err) {
+                        return console.error(err);
+                    } else {
+                        fs.readFile(filePath, 'utf8', function (err, data) {
+                            if (err) {
+                                return console.log(err);
+                            }
+                            res.json({ data: data });
+                        });
+                    }
+                    console.log('File download complete');
+                }
+            });
         });
     });
 
